@@ -77,5 +77,5 @@ void CMat::ResetMaterial()
 	static const float flDefault[3] = { 1, 1, 1 };
 	gBase.RenderView->SetBlend(1);
 	gBase.RenderView->SetColorModulation(flDefault);
-	gBase.ModelRender->ForcedMaterialOverride(NULL);
+	gBase.ModelRender->ForcedMaterialOverride(nullptr);
 }

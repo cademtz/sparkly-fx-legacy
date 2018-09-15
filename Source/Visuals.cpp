@@ -102,8 +102,11 @@ void CVisuals::DrawModelExecute(
 	if (type != ent_id::CTFPlayer && type != ent_id::CTFWearable)
 		return;
 
-	bool bReset = true;
+	// Normal visibility will just run once
+	// And "Always" visibility will run twice with the same mat
+	bool bReset = player_enabled.value > 2;
 
+	// Stubbed for now. More materials later.
 	Matptr desired = gMat.glow;
 
 	byte team = entity->Team();
@@ -116,12 +119,16 @@ void CVisuals::DrawModelExecute(
 			color = hat_mat.bDef ? colors_team[team] : hat_mat.color;
 	}
 
-	desired->SetMaterialVarFlag(MATERIAL_VAR_IGNOREZ, player_enabled.value != 3);
+	desired->SetMaterialVarFlag(MATERIAL_VAR_IGNOREZ, player_enabled.value != 1);
 	gMat.ForceMaterial(color, desired);
-	if (player_enabled.value == 1 || player_enabled.value == 3)
-		bReset = false;
-	else if (player_enabled.value == 2)
+
+	// "Behind walls" / "always" requires a second render with ignorez before the original
+	if (player_enabled.value != 1)
+	{
 		Original(gBase.ModelRender, state, pInfo, pCustomBoneToWorld);
+		if (player_enabled.value == 2) // Now we will render a normal visibility model with "always" enabled
+			desired->SetMaterialVarFlag(MATERIAL_VAR_IGNOREZ, false);
+	}
 
 	if (bReset)
 		gMat.ResetMaterial();

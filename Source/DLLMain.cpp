@@ -12,7 +12,6 @@ DWORD WINAPI AttachThread(LPVOID lpArguments)
 	return 1;
 }
 
-#include "Menu.h"
 BOOL APIENTRY DllMain(HMODULE hInstance, DWORD dwReason, LPVOID lpReserved)
 {
 	if (dwReason == DLL_PROCESS_ATTACH)

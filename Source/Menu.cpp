@@ -1,11 +1,7 @@
 #include "Menu.h"
 #include "CDraw.h"
+
 Menu gMenu;
-
-#define keyDown GetAsyncKeyState
-#define keyPress(x) keyDown(x) & 1
-#define boolStr(boolean) string(boolean? "True" : "False")
-
 CKey gKey;
 
 // - Feel free to use whatever default width you want
@@ -41,18 +37,16 @@ void Menu::CreateGUI()
 #define TAB_WIDTH 150
 #define MENU_TOPBAR 30
 
+#include "Panels.h"
 void Menu::Draw()
 {
-#pragma region Handle input
 	if (key == VK_INSERT || key == VK_F11)
 		enabled = !enabled;
 
 	if (!enabled)
 		return;
 
-	//style->WaterMark("Sparkly", 20, 20);
-	gDraw.DrawString(10, 10, SColor(150, 120), "0.1 beta - " __DATE__, gFonts.verdana_bold);
-
+#pragma region Handle input
 	static bool dragging = false;
 
 	if (mb == e_mb::lclick && mouseOver(pos.x, pos.y, scale.x, MENU_TOPBAR))
@@ -66,21 +60,30 @@ void Menu::Draw()
 		pos.y += mouse.y - pmouse.y;
 	}
 
-	POINT _pos = pos, _scale = scale;
-	_scale.y += MENU_TOPBAR;
 #pragma endregion
 
 #pragma region Main window
-	// Menu outline
-	gDraw.OutlineRect(pos.x - 1, pos.y - 1, _scale.x + 2, _scale.y + 2, SColor(0));
-	int topbar = style->TopBar(_pos.x, _pos.y, _scale.x, "Sparkly FX");
+	// Topbar + outline
+	int topbar = style->TopBar(pos.x, pos.y, scale.x, "Sparkly FX");
+	gDraw.OutlineRect(pos.x - 1, pos.y - 1, scale.x + 2, scale.y + topbar + 2, SColor(0));
 
-	// Re-adjusting pos and scale for easy coding
-	_pos.y += topbar, _scale.y -= topbar;
+	if (pos.x < 0)
+		pos.x = 0;
+	else if (pos.x + scale.x > gScreenSize.width)
+		pos.x = gScreenSize.width - scale.x;
+	if (pos.y < 0)
+		pos.y = 0;
+	else if (pos.y + topbar > gScreenSize.height)
+		pos.y = gScreenSize.height - topbar;
+
+	// Re-adjust pos to draw below the topbar
+	POINT _pos = { pos.x, pos.y + topbar };
 
 	// Tab region
-	gDraw.DrawRect(_pos.x, _pos.y, TAB_WIDTH, _scale.y, SColor(22, 23, 24));
-	gDraw.DrawLine(_pos.x + TAB_WIDTH - 1, _pos.y, _pos.x + TAB_WIDTH - 1, _pos.y + _scale.y, SColor(0));
+	gDraw.DrawRect(_pos.x, _pos.y, TAB_WIDTH, scale.y, SColor(22, 23, 24));
+	gDraw.DrawLine(_pos.x + TAB_WIDTH - 1, _pos.y, _pos.x + TAB_WIDTH - 1, _pos.y + scale.y, SColor(0));
+	gDraw.DrawString(_pos.x + 10, _pos.y + scale.y - 32, SColor(120, 120), "- 0.1 beta - ", gFonts.verdana_bold);
+	gDraw.DrawString(_pos.x + 10, _pos.y + scale.y - 18, SColor(120, 120), "Build: " __DATE__, gFonts.verdana_bold);
 
 	Tabs.SetPos(_pos.x, _pos.y + topbar);
 	Tabs.SetWidth(TAB_WIDTH);
@@ -88,11 +91,13 @@ void Menu::Draw()
 	Tabs.Draw(false);
 
 	// Control region
-	gDraw.DrawRect(_pos.x + TAB_WIDTH, _pos.y, _scale.x - TAB_WIDTH, _scale.y, SColor(36, 36, 42));
+	gDraw.DrawRect(_pos.x + TAB_WIDTH, _pos.y, scale.x - TAB_WIDTH, scale.y, SColor(36, 36, 42));
 	// Dividing line
-	gDraw.DrawLine(_pos.x, _pos.y, _pos.x + _scale.x, _pos.y, SColor(0));
+	gDraw.DrawLine(_pos.x, _pos.y, _pos.x + scale.x, _pos.y, SColor(0));
+
 	// Re-adjusting pos and scale again
-	_pos.x += TAB_WIDTH + 3, _scale.x = scale.x - (_pos.x - pos.x);
+	_pos.x += TAB_WIDTH + 3;
+	POINT _scale = { scale.x - (_pos.x - pos.x), scale.y };
 
 #pragma endregion
 
@@ -168,14 +173,14 @@ void Menu::GetInput()
 	pmouse = mouse;
 	mouse = { mx, my };
 
-	if (keyDown(VK_LBUTTON))
+	if (GetAsyncKeyState(VK_LBUTTON))
 	{
 		if (mb == e_mb::lclick || mb == e_mb::ldown)
 			mb = e_mb::ldown;
 		else
 			mb = e_mb::lclick;
 	}
-	else if (keyDown(VK_RBUTTON))
+	else if (GetAsyncKeyState(VK_RBUTTON))
 	{
 		if (mb == e_mb::rclick || mb == e_mb::rdown)
 			mb = e_mb::rdown;
@@ -204,18 +209,32 @@ LRESULT __stdcall Hooked_WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 			gMenu.mw = e_mw::down;
 		break;
 	case WM_KEYDOWN:
+	case WM_SYSKEYDOWN: // Allows input to work with alt key
 		if (wParam > 255)
 			break;
-		gMenu.keys[wParam] = true, gMenu.last_key = wParam, gMenu.key = wParam;
-
+		gMenu.keys[wParam] = true, gMenu.last_key = wParam = gMenu.key = wParam;
 		break;
 	case WM_KEYUP:
-		if (wParam > 255)
+	case WM_SYSKEYUP:
+		// Avoid Mouse 3/4/5 here
+		if (wParam > 255 && wParam < VK_MBUTTON && wParam > VK_XBUTTON2)
 			break;
 		gMenu.keys[wParam] = false;
 		if (gMenu.last_key == wParam)
 			gMenu.last_key = NULL;
+		break;
+	case WM_MBUTTONDOWN:
+	case WM_MBUTTONUP:
+		gMenu.keys[VK_MBUTTON] = uMsg == WM_MBUTTONDOWN;
+		if (uMsg == WM_MBUTTONDOWN)
+			gMenu.last_key = gMenu.key = VK_MBUTTON;
+		else if (gMenu.last_key == VK_MBUTTON)
+			gMenu.last_key = NULL;
+		break;
 	}
+
+	if (gMenu.enabled && gMenu.keys[VK_ESCAPE])
+		return 0; // Don't let escape key affect the game while using our UI
 
 	return CallWindowProc(gMenu.windowProc, hWnd, uMsg, wParam, lParam);
 }

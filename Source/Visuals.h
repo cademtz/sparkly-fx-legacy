@@ -15,7 +15,7 @@ public:
 
 	// Player effects
 
-	Listbox player_enabled = Listbox("Player materials", { "Disabled", "Always visible", "Only through walls", "Default visibility"}, 1);
+	Listbox player_enabled = Listbox("Player materials", { "Disabled", "Default visibility", "Always visible", "Only through walls"}, 1);
 	Listbox hat_enabled = Listbox("Hat override", { "Disabled", "Same as player", "Hat color" },  1);
 	ColorPicker player_mat = ColorPicker("Player color", SColor(200));
 	ColorPicker hat_mat = ColorPicker("Hat color", SColor(200));
