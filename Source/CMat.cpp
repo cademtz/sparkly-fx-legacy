@@ -10,6 +10,9 @@ void CMat::Initialize()
 	CHECKPTR(shaded = CreateMaterial(false, false));
 	CHECKPTR(shiny = CreateMaterial(false, true, false, true));
 	CHECKPTR(wireframe = CreateMaterial(true, true, true));
+
+	// Prevent the glow material from being deleted at any point
+	glow->IncrementReferenceCount();
 }
 
 Matptr CMat::CreateMaterial(bool IgnoreZ, bool Flat, bool Wireframe, bool Shiny)

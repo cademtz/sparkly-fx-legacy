@@ -12,6 +12,7 @@ public:
 
 	Checkbox world_enabled = Checkbox("Enabled");
 	ColorPicker world_clr = ColorPicker("World color", SColor(200));
+	ColorPicker sky_clr = ColorPicker("Sky color", SColor(200));
 
 	// Player effects
 

@@ -6,16 +6,17 @@
 CVisuals gVisuals;
 
 // - Using old and new world materials to efficiently decide when to set / reset our colors
-unordered_map<MaterialHandle_t, SColor> worldmat_new, worldmat_old;
+// - For now, not optimized very well at all
+unordered_map<MaterialHandle_t, SColor> worldmats_new, worldmats_old;
 
 void CVisuals::FrameStageNotify(ClientFrameStage_t Stage)
 {
 	bool bReset = !gBase.Engine->IsInGame() || !world_enabled.value;
-	if (bReset && worldmat_new.size())
+	if (bReset && worldmats_old.size())
 	{
 		if (gBase.Engine->IsInGame())
 		{
-			for (auto& hMat : worldmat_old) // Reset the material colors
+			for (auto& hMat : worldmats_old) // Reset the material colors
 			{	
 				IMaterial* mat = gBase.MatSystem->GetMaterial(hMat.first);
 				if (!mat)
@@ -28,8 +29,8 @@ void CVisuals::FrameStageNotify(ClientFrameStage_t Stage)
 			}
 		}
 
-		worldmat_new.clear();	// Clear cache of materials
-		worldmat_old.clear();	//
+		worldmats_new.clear();	// Clear cache of materials
+		worldmats_old.clear();	//
 	}
 
 	if (!world_enabled.value || Stage != FRAME_NET_UPDATE_POSTDATAUPDATE_END)
@@ -38,28 +39,36 @@ void CVisuals::FrameStageNotify(ClientFrameStage_t Stage)
 	for (MaterialHandle_t i = gBase.MatSystem->FirstMaterial(); i != gBase.MatSystem->InvalidMaterial(); i = gBase.MatSystem->NextMaterial(i))
 	{
 		IMaterial* mat = gBase.MatSystem->GetMaterial(i);
-
-		if (!mat || strcmp(mat->GetTextureGroupName(), TEXTURE_GROUP_WORLD))
+		if (!mat)
 			continue;
 
-		if (worldmat_new.find(i) == worldmat_new.end())
+		bool bIsSkybox = !strcmp(mat->GetTextureGroupName(), TEXTURE_GROUP_SKYBOX);
+		if (!bIsSkybox && strcmp(mat->GetTextureGroupName(), TEXTURE_GROUP_WORLD))
+			continue;
+
+		if (worldmats_new.find(i) == worldmats_new.end())
 		{
 			float r, g, b, a = mat->GetAlphaModulation();
 			mat->GetColorModulation(&r, &g, &b);
 
 			SColor old_color(r * 255.f, g * 255.f, b * 255.f, a * 255.f);
-			worldmat_new.emplace(i, old_color);
-			worldmat_old.emplace(i, old_color);
+			worldmats_old.emplace(i, old_color);
+			worldmats_new.emplace(i, old_color);
 		}
 
-		SColor color = world_clr.bDef ? worldmat_old.at(i) : world_clr.color;
-		if (worldmat_new.at(i) != color)
+		SColor color = worldmats_old.at(i);
+		if (bIsSkybox)
+			color = sky_clr.bDef ? SColor(255) : sky_clr.color;
+		else
+			color = world_clr.bDef ? SColor(255) : world_clr.color;
+
+		if (worldmats_new.at(i) != color)
 		{
 			float blend[4] = { (float)color[0] / 255.f, (float)color[1] / 255.f, (float)color[2] / 255.f, (float)color[3] / 255.f };
 			mat->ColorModulate(blend[0], blend[1], blend[2]);
 			mat->AlphaModulate(blend[3]);
 
-			worldmat_new.at(i) = color;
+			worldmats_new.at(i) = color;
 		}
 	}
 }
@@ -108,6 +117,8 @@ void CVisuals::DrawModelExecute(
 
 	// Stubbed for now. More materials later.
 	Matptr desired = gMat.glow;
+	if (!desired)
+		return;
 
 	byte team = entity->Team();
 	SColor color = player_mat.bDef ? colors_team_light[team] : player_mat.color;

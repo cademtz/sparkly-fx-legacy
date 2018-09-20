@@ -16,7 +16,8 @@ void Menu::CreateGUI()
 		new Tab("Visuals", {
 			new Groupbox("World settings", {
 				&gVisuals.world_enabled,
-				&gVisuals.world_clr
+				&gVisuals.world_clr,
+				&gVisuals.sky_clr
 			}, GROUP_WIDTH),
 			new Groupbox("Player effects", {
 				&gVisuals.player_enabled,
