@@ -70,7 +70,7 @@ private:
 	vector<Dialog*> dialogs;
 
 	// - Set the starting position and menu scale
-	POINT pos = { 100, 100 }, scale = { 550, 300 };
+	POINT pos = { 100, 100 }, scale = { 560, 300 };
 
 	TabGroup Tabs;
 };

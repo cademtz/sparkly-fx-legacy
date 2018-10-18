@@ -5,23 +5,53 @@
 #include "VMTHooks.h"
 
 #include "Menu.h"
+#include "Visuals.h"
 
 CScreenSize gScreenSize;
 //===================================================================================
 void __fastcall Hooked_PaintTraverse( PVOID pPanels, int edx, unsigned int vguiPanel, bool forceRepaint, bool allowForce )
 {
+	VMTManager& hook = VMTManager::GetHook(pPanels);
+	auto Original = hook.GetMethod<void(__thiscall*)(PVOID, unsigned int, bool, bool)>((int)e_offset::PaintTraverse);
+
 	try
 	{
-		VMTManager& hook = VMTManager::GetHook(pPanels);
-		hook.GetMethod<void(__thiscall*)(PVOID, unsigned int, bool, bool)>((int)e_offset::PaintTraverse)(pPanels, vguiPanel, forceRepaint, allowForce);
-
-		static unsigned int FocusOverlay = 0;
-		if (!FocusOverlay && vguiPanel && !strcmp(gBase.Panels->GetName(vguiPanel), "FocusOverlayPanel"))
+		static VPANEL FocusOverlay = 0, BaseViewport = 0, HudScope = 0, HudDeath = 0;
+		const char* szPanel = gBase.Panels->GetName(vguiPanel);
+		if (vguiPanel)
 		{
-			// Gets FocusOverlayPanel ID to avoid constantly string comparing
-			FocusOverlay = vguiPanel;
-			Intro();
+			if (!FocusOverlay && !strcmp(szPanel, "FocusOverlayPanel"))
+			{
+				// Gets FocusOverlayPanel ID to avoid constantly string comparing
+				FocusOverlay = vguiPanel;
+				Intro();
+			}
+			else if (!BaseViewport && !strcmp(szPanel, "CBaseViewport"))
+				BaseViewport = vguiPanel;
+			else if (!HudScope && !strcmp(szPanel, "HudScope"))
+				HudScope = vguiPanel;
+			else if (!HudDeath && !strcmp(szPanel, "HudDeathNotice"))
+				HudDeath = vguiPanel; // There is a more efficient way to grab these, but I'll fix that later
 		}
+
+		bool bForceHud = gVisuals.killfeed.value || gVisuals.noscope.value;
+		if (bForceHud && BaseViewport && HudScope && HudDeath)
+		{
+			int count = gBase.Panels->GetChildCount(BaseViewport);
+			for (int i = 0; i < count; i++)
+			{
+				if (vguiPanel == gBase.Panels->GetChild(BaseViewport, i))
+				{
+					if (gVisuals.noscope.value && vguiPanel == HudScope)
+						return;
+					if (gVisuals.killfeed.value && vguiPanel != HudDeath &&
+						(gVisuals.noscope.value || vguiPanel != HudScope))
+							return; // Remove all HUD elements except scope (depending on scope option)
+				}
+			}
+		}
+
+		Original(pPanels, vguiPanel, forceRepaint, allowForce);
 
 		if (FocusOverlay != vguiPanel || gBase.Engine->IsDrawingLoadingImage())
 			return;
@@ -35,7 +65,9 @@ void __fastcall Hooked_PaintTraverse( PVOID pPanels, int edx, unsigned int vguiP
 			gDraw.Reload();
 		// ========== Update your input FIRST to enable usage throughout your program ========== //
 		gMenu.GetInput();
+
 		// - Other code here that requires input can go here
+
 		// ========== Menu code must be called AFTER everything else draws ========== //
 		gMenu.Draw();
 		gBase.Panels->SetMouseInputEnabled(vguiPanel, gMenu.enabled);

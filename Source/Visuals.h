@@ -21,6 +21,11 @@ public:
 	ColorPicker player_mat = ColorPicker("Player color", SColor(200));
 	ColorPicker hat_mat = ColorPicker("Hat color", SColor(200));
 
+	// Heads-up display
+
+	Checkbox killfeed = Checkbox("Killfeed only");
+	Checkbox noscope = Checkbox("No scope overlay");
+
 	void FrameStageNotify(ClientFrameStage_t Stage);
 	void DrawModelExecute(
 		const DrawModelState_t &state,

@@ -1,19 +1,18 @@
 #pragma once
-#include <Windows.h>
-#include <string>
-using namespace std;
+#pragma optimize("gsy",on)
+#pragma warning( disable : 4244 ) // Possible loss of data
 
+#define WIN32_LEAN_AND_MEAN
+#include <string>
 #include "Vector.h"
 #include "Vector2.h"
 #include "Offsets.h"
 
-#define WIN32_LEAN_AND_MEAN
-#pragma optimize("gsy",on)
-#pragma warning( disable : 4244 ) //Possible loss of data
-
 #define PI 3.14159265358979323846f
-
 #define RADPI 57.295779513082f
+
+using namespace std;
+typedef unsigned char byte;
 
 typedef void* (*CreateInterfaceFn)(const char *pName, int *pReturnCode);
 typedef struct CreateInterface
@@ -72,6 +71,7 @@ class CModelRender;
 class IEngineTrace;
 class EngineClient;
 class CMaterialSystem;
+class ClientModeShared;
 class IGameEventManager2;
 
 class IMemAlloc;
@@ -93,6 +93,7 @@ public:
 	IEngineTrace*		EngineTrace;
 	EngineClient*		Engine;
 	CMaterialSystem*	MatSystem;
+	ClientModeShared*	ClientMode;
 	IGameEventManager2*	GameEventManager;
 
 	IMemAlloc* g_pMemAlloc;

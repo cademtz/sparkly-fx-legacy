@@ -24,7 +24,11 @@ void Menu::CreateGUI()
 				&gVisuals.hat_enabled,
 				&gVisuals.player_mat,
 				&gVisuals.hat_mat
-			}, GROUP_WIDTH)
+			}, GROUP_WIDTH),
+			new Groupbox("Heads-up display", {
+				&gVisuals.killfeed,
+				&gVisuals.noscope,
+			}, GROUP_WIDTH),
 		})
 	);
 
@@ -83,7 +87,7 @@ void Menu::Draw()
 	// Tab region
 	gDraw.DrawRect(_pos.x, _pos.y, TAB_WIDTH, scale.y, SColor(22, 23, 24));
 	gDraw.DrawLine(_pos.x + TAB_WIDTH - 1, _pos.y, _pos.x + TAB_WIDTH - 1, _pos.y + scale.y, SColor(0));
-	gDraw.DrawString(_pos.x + 10, _pos.y + scale.y - 32, SColor(120, 120), "- 0.1 beta - ", gFonts.verdana_bold);
+	gDraw.DrawString(_pos.x + 10, _pos.y + scale.y - 32, SColor(120, 120), "- 0.3 beta - ", gFonts.verdana_bold);
 	gDraw.DrawString(_pos.x + 10, _pos.y + scale.y - 18, SColor(120, 120), "Build: " __DATE__, gFonts.verdana_bold);
 
 	Tabs.SetPos(_pos.x, _pos.y + topbar);

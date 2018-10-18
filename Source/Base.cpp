@@ -39,10 +39,12 @@ bool CBaseManager::GetInterfaces()
 	Client = (CHLClient*)						ClientFactory("VClient017");
 	Cvar = (ICvar*)								CVarFactory("VEngineCvar004");
 
-	if (DWORD globalsScan = gSig.FromClient("A3 ? ? ? ? 8D 45 08 6A 01 50 E8"))
-		gBase.Globals = **(CGlobals***)(globalsScan + 1);
-	else
-		gBase.Fatal("Fatal error", "Sparkly failed to get a signature to 'CGlobals'!%s", "\nThe program will now exit.");
+	DWORD clientmodeScan = gSig.FromClient("8B 0D ? ? ? ? 8B 02 D9 05"), globalsScan = gSig.FromClient("A3 ? ? ? ? 8D 45 08 6A 01 50 E8");
+	if (!clientmodeScan || !globalsScan)
+		gBase.Fatal("Fatal error", "Sparkly's signatures to CGlobals and/or ClientModeShared is outdated!%s", "\nThe program will now exit.");
+
+	Globals = **(CGlobals***)(globalsScan + 1);
+	ClientMode = **(ClientModeShared***)(clientmodeScan + 2);
 
 	Engine->ClientCmd_Unrestricted("echo Sparkly FX: Grabbed interfaces...");
 	return true;
