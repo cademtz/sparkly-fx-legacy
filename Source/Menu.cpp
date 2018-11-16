@@ -10,6 +10,7 @@ CKey gKey;
 #define MENU_TOPBAR 30
 
 #include "Visuals.h"
+#include "Dev Tools.h"
 void Menu::CreateGUI()
 {
 	Tabs.AddTab(
@@ -28,6 +29,16 @@ void Menu::CreateGUI()
 			new Groupbox("Heads-up display", {
 				&gVisuals.killfeed,
 				&gVisuals.noscope,
+			}, GROUP_WIDTH),
+		})
+	);
+
+	Tabs.AddTab(
+		new Tab("Dev Tools", {
+			&gDevTools.enabled,
+			new Groupbox("Entities", {
+				&gDevTools.ent_type,
+				&gDevTools.ent_index
 			}, GROUP_WIDTH),
 		})
 	);

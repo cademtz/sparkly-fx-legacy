@@ -89,6 +89,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\Cade%27s stuff\Source codes\Sparkly FX\Source\Dev Tools.cpp" />
     <ClCompile Include="Base.cpp" />
     <ClCompile Include="CMat.cpp" />
     <ClCompile Include="DrawModelExecute.cpp" />
@@ -107,6 +108,7 @@
     <ClCompile Include="VMTHooks.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\Cade%27s stuff\Source codes\Sparkly FX\Source\Dev Tools.h" />
     <ClInclude Include="Base.h" />
     <ClInclude Include="CMat.h" />
     <ClInclude Include="DrawModelExecute.h" />

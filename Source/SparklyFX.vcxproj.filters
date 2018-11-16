@@ -27,7 +27,7 @@
       <Filter>Sparkly Base\CDraw</Filter>
     </ClCompile>
     <ClCompile Include="Visuals.cpp">
-      <Filter>Visuals</Filter>
+      <Filter>Features\Visuals</Filter>
     </ClCompile>
     <ClCompile Include="Base.cpp">
       <Filter>Sparkly Base\Base</Filter>
@@ -46,6 +46,9 @@
     </ClCompile>
     <ClCompile Include="KeyValues.cpp">
       <Filter>SDK\KeyValues</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Cade%27s stuff\Source codes\Sparkly FX\Source\Dev Tools.cpp">
+      <Filter>Features\Dev Tools</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -89,7 +92,7 @@
       <Filter>Sparkly Base\CDraw</Filter>
     </ClInclude>
     <ClInclude Include="Visuals.h">
-      <Filter>Visuals</Filter>
+      <Filter>Features\Visuals</Filter>
     </ClInclude>
     <ClInclude Include="Base.h">
       <Filter>Sparkly Base\Base</Filter>
@@ -129,6 +132,9 @@
     </ClInclude>
     <ClInclude Include="Entity enums.h">
       <Filter>SDK\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Cade%27s stuff\Source codes\Sparkly FX\Source\Dev Tools.h">
+      <Filter>Features\Dev Tools</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -186,11 +192,17 @@
     <Filter Include="GUI\Headers">
       <UniqueIdentifier>{3c21cb69-7076-4545-9d63-1eee388d65ac}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Visuals">
-      <UniqueIdentifier>{a63a5e61-de42-40d8-b146-8e37cf049891}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Sparkly Base\CDraw">
       <UniqueIdentifier>{fc20898a-fdbc-4352-903e-126f229e596f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Features">
+      <UniqueIdentifier>{387f4bb7-4930-4ad2-99f2-ca1d90234c8c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Features\Visuals">
+      <UniqueIdentifier>{a63a5e61-de42-40d8-b146-8e37cf049891}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Features\Dev Tools">
+      <UniqueIdentifier>{3d352421-6dbf-4171-9067-466d16e99b0a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

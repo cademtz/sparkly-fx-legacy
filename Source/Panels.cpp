@@ -1,11 +1,12 @@
 #include "VGUI.h"
-#include "Engine.h"
+#include "Entity.h"
 #include "Panels.h"
 #include "CDraw.h"
 #include "VMTHooks.h"
 
 #include "Menu.h"
 #include "Visuals.h"
+#include "Dev Tools.h"
 
 CScreenSize gScreenSize;
 //===================================================================================
@@ -67,6 +68,19 @@ void __fastcall Hooked_PaintTraverse( PVOID pPanels, int edx, unsigned int vguiP
 		gMenu.GetInput();
 
 		// - Other code here that requires input can go here
+
+		if (gBase.Engine->IsInGame())
+		{
+			// Main entity loop, will skip all players
+			for (size_t i = gBase.Engine->GetMaxClients() + 1; i <= gBase.EntList->GetHighestEntityIndex(); i++)
+			{
+				CBaseEntity* ent = GetBaseEntity(i);
+				if (!ent || ent->IsDormant())
+					continue; // Avoid null pointers and entities that haven't updated
+
+				gDevTools.DrawEntity(ent);
+			}
+		}
 
 		// ========== Menu code must be called AFTER everything else draws ========== //
 		gMenu.Draw();
