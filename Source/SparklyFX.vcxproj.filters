@@ -47,7 +47,7 @@
     <ClCompile Include="KeyValues.cpp">
       <Filter>SDK\KeyValues</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Cade%27s stuff\Source codes\Sparkly FX\Source\Dev Tools.cpp">
+    <ClCompile Include="Dev Tools.cpp">
       <Filter>Features\Dev Tools</Filter>
     </ClCompile>
   </ItemGroup>
@@ -133,7 +133,7 @@
     <ClInclude Include="Entity enums.h">
       <Filter>SDK\Entity</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\Cade%27s stuff\Source codes\Sparkly FX\Source\Dev Tools.h">
+    <ClInclude Include="Dev Tools.h">
       <Filter>Features\Dev Tools</Filter>
     </ClInclude>
   </ItemGroup>
