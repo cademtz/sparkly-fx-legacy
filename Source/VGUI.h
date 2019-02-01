@@ -105,15 +105,6 @@ public:
 	virtual void SetTopmostPopup(VPANEL vguiPanel, bool state) = 0;
 };
 
-class Panel
-{
-	void* _vtable;
-	int _pad[18];
-	VPANEL _vpanel;
-public:
-	inline VPANEL GetVPanel() { return _vpanel; }
-};
-
 struct Vertex_t;
 class ISurface
 {

@@ -60,14 +60,7 @@ public:
 };
 
 class Panel;
-class ClientModeShared
-{
-	void* _vtable;
-	int _pad[2];
-	Panel* m_pViewport;
-public:
-	inline Panel* GetViewport() { return m_pViewport; }
-};
+class ClientModeShared;
 
 #include "studio.h"
 struct model_t;

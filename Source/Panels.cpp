@@ -9,6 +9,9 @@
 #include "Dev Tools.h"
 
 CScreenSize gScreenSize;
+
+VPANEL FindPanel(VPANEL Parent, const char* szName);
+
 //===================================================================================
 void __fastcall Hooked_PaintTraverse( PVOID pPanels, int edx, unsigned int vguiPanel, bool forceRepaint, bool allowForce )
 {
@@ -27,16 +30,18 @@ void __fastcall Hooked_PaintTraverse( PVOID pPanels, int edx, unsigned int vguiP
 				FocusOverlay = vguiPanel;
 				Intro();
 			}
-			else if (!BaseViewport && !strcmp(szPanel, "CBaseViewport"))
-				BaseViewport = vguiPanel;
-			else if (!HudScope && !strcmp(szPanel, "HudScope"))
-				HudScope = vguiPanel;
-			else if (!HudDeath && !strcmp(szPanel, "HudDeathNotice"))
-				HudDeath = vguiPanel; // There is a more efficient way to grab these, but I'll fix that later
+			else if (!BaseViewport && gBase.Engine->IsInGame())
+			{
+				VPANEL parent = gBase.Panels->GetParent(FocusOverlay); // Get root panel
+				if (gBase.Panels->HasParent(FocusOverlay, parent) && (BaseViewport = FindPanel(parent, "CBaseViewport")))
+				{
+					HudScope = FindPanel(BaseViewport, "HudScope");
+					HudDeath = FindPanel(BaseViewport, "HudDeathNotice");
+				}
+			}
 		}
 
-		bool bForceHud = gVisuals.killfeed.value || gVisuals.noscope.value;
-		if (bForceHud && BaseViewport && HudScope && HudDeath)
+		if (BaseViewport && (gVisuals.killfeed.value || gVisuals.noscope.value))
 		{
 			int count = gBase.Panels->GetChildCount(BaseViewport);
 			for (int i = 0; i < count; i++)
@@ -102,7 +107,7 @@ void __fastcall Hooked_PaintTraverse( PVOID pPanels, int edx, unsigned int vguiP
 
 #include "Netvars.h"
 #include "CMat.h"
-void Intro( void )
+void Intro()
 {
 	gDraw.Init();
 	gMat.Initialize();
@@ -113,4 +118,19 @@ void Intro( void )
 
 	// It is a good day
 	gBase.Engine->ClientCmd_Unrestricted("echo Sparkly FX has successfully injected!");
+}
+
+VPANEL FindPanel(VPANEL Parent, const char* szName)
+{
+	if (!strcmp(gBase.Panels->GetName(Parent), szName))
+		return Parent;
+
+	for (int i = 0; i < gBase.Panels->GetChildCount(Parent); i++)
+	{
+		VPANEL panel = gBase.Panels->GetChild(Parent, i);
+		if (panel = FindPanel(panel, szName))
+			return panel;
+	}
+
+	return 0; // Failed to find panel
 }
