@@ -9,7 +9,7 @@ bool CBaseManager::GetInterfaces()
 {
 	// Grab the client module first, since it is loaded after everything else
 	CreateInterface ClientFactory;
-	for (byte i = 0; i < 255; i++)
+	while (1)
 	{
 		ClientFactory = CreateInterface("client.dll", false);
 		if (ClientFactory.instance)
@@ -41,7 +41,7 @@ bool CBaseManager::GetInterfaces()
 
 	DWORD clientmodeScan = gSig.FromClient("8B 0D ? ? ? ? 8B 02 D9 05"), globalsScan = gSig.FromClient("A3 ? ? ? ? 8D 45 08 6A 01 50 E8");
 	if (!clientmodeScan || !globalsScan)
-		gBase.Fatal("Fatal error", "Sparkly's signatures to CGlobals and/or ClientModeShared is outdated!%s", "\nThe program will now exit.");
+		gBase.Fatal("Fatal error", "Sparkly's signatures are outdated!%s", "\nThe program will now exit.");
 
 	Globals = **(CGlobals***)(globalsScan + 1);
 	ClientMode = **(ClientModeShared***)(clientmodeScan + 2);
@@ -84,8 +84,10 @@ void COffsets::GetOffsets()
 	// Add signatures here
 	CHECKPTR(KeyValues = gSig.FromEngine("FF 15 ? ? ? ? 83 C4 08 89 06 8B C6"));
 	CHECKPTR(LoadFromBuffer = gSig.FromEngine("55 8B EC 83 EC 38 53 8B 5D 0C"));
+	CHECKPTR(ParentEnt = gSig.FromClient("E8 ? ? ? ? 8B F8 85 FF 75 07 33 C0"));
 
 	KeyValues -= 0x42;
+	ParentEnt = *(size_t*)(ParentEnt + 1) + ParentEnt + 5;
 
 	gBase.Engine->ClientCmd_Unrestricted("echo Sparkly FX: Got signatures...");
 }

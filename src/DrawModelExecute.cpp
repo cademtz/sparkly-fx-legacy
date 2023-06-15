@@ -7,6 +7,8 @@
 
 #include "Visuals.h"
 
+bool drawModel = true;
+
 void __stdcall Hooked_DrawModelExecute(
 	const DrawModelState_t &state,
 	const ModelRenderInfo_t &pInfo,
@@ -24,6 +26,16 @@ void __stdcall Hooked_DrawModelExecute(
 		MessageBox(NULL, "Failed Hooked_DrawModelExecute()", "Error", MB_OK);
 		return CallOriginal(gBase.ModelRender, state, pInfo, pCustomBoneToWorld);
 	}
-	CallOriginal(gBase.ModelRender, state, pInfo, pCustomBoneToWorld);
+	if (drawModel)
+		CallOriginal(gBase.ModelRender, state, pInfo, pCustomBoneToWorld);
+	drawModel = true;
 	gMat.ResetMaterial();
+}
+
+bool __fastcall Hooked_ShouldDraw(IClientRenderable* Renderable) {
+	if (gVisuals.scopefix.value)
+		return true;
+
+	VMTManager& hook = VMTManager::GetHook(Renderable);
+	return hook.GetMethod<ShouldDrawFn>((int)e_offset::ShouldDraw)(Renderable);
 }

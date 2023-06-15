@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include "Engine.h"
 #include "getvfunc.h"
 
@@ -52,6 +53,8 @@ NV_RET(name, type, offset)
 class CBaseEntity
 {
 public:
+	inline void* GetRenderable() { return (void*)(this + 0x4); }
+
 	// - Gets the origin position (usually the bottom) of the entity
 	Vector& GetAbsOrigin()
 	{
@@ -122,30 +125,38 @@ public:
 		return getvfunc<OriginalFn>(pRenderable, 34)(pRenderable);
 	}
 
+	inline bool IsType(const char* class_name) {
+		return FastEntityCheck(this, class_name);
+	}
+
 	// - Gets the entity type
-	inline ent_id Type()
+	inline int Type()
 	{
-		return (ent_id)this->GetClientClass()->iClassID;
+		return (int)this->GetClientClass()->iClassID;
 	}
 	// - Returns true if this entity is a player,
 	//   and sets it to the specified player pointer
 	bool ToPlayer(CPlayer* &player)
 	{
-		if (this != nullptr && !this->IsDormant() && this->Type() == ent_id::CTFPlayer)
+		if (this != nullptr && !this->IsDormant() && this->IsType(ent_id::CTFPlayer))
 		{
 			player = (CPlayer*)this;
 			return true;
 		}
 		return false;
 	}
+
+	CBaseEntity* GetFollowedEntity() {
+		return ((CBaseEntity * (__thiscall*)(void*))gOffsets.ParentEnt)(this);
+	}
+
 	// - Gets the entity's team
 	// - Example:
 	//		if (player->Team() == 2) string teamName = "BLU"
-	NV_RET(Team, byte, nEntity.m_iTeamNum)
-	NV_RET(GetSimulationTime, float, nEntity.m_flSimulationTime)
-	NV_RET(GetCollideableMins, Vector, nEntity.m_vecMins)
-	NV_RET(GetCollideableMaxs, Vector, nEntity.m_vecMaxs)
-
+	NV_RET(Team, uint8_t, nEntity.m_iTeamNum);
+	NV_RET(GetSimulationTime, float, nEntity.m_flSimulationTime);
+	NV_RET(GetCollideableMins, Vector, nEntity.m_vecMins);
+	NV_RET(GetCollideableMaxs, Vector, nEntity.m_vecMaxs);
 };
 
 class CBaseObject : public CBaseEntity
@@ -172,7 +183,7 @@ public:
 	//   and sets it to the specified knife pointer
 	bool ToKnife(CKnife* &Knife)
 	{
-		if (this != nullptr && !this->IsDormant() && this->Type() == ent_id::CTFKnife)
+		if (this != nullptr && !this->IsDormant() && this->IsType(ent_id::CTFKnife))
 		{
 			Knife = (CKnife*)this;
 			return true;
@@ -221,9 +232,8 @@ public:
 	OFF_RET(AttributeList, CAttributeList, nPlayer.m_AttributeList)
 
 	// - Returns false if this entity is null or not a player
-	bool Valid()
-	{
-		return this && !this->IsDormant() && this->Type() == ent_id::CTFPlayer;
+	bool Valid() {
+		return this && !this->IsDormant() && this->IsType(ent_id::CTFPlayer);
 	}
 	// - Gets the player's max health
 	int MaxHealth()

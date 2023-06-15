@@ -2,6 +2,7 @@
 #include "Netvars.h"
 #include "dt_recv2.h"
 #include "Engine.h"
+#include "Entity.h"
 
 NetEntity nEntity;
 NetPlayer nPlayer;
@@ -21,6 +22,27 @@ void GetAllNetvars()
 	{
 		gBase.Fatal("Fatal error", "Failed to initialize netvars!\nThe game will now close.");
 	}
+}
+
+static std::unordered_map<std::string, ClientClass*> MakeClientClassMap() {
+	if (!gBase.Client)
+		gBase.Fatal(__FUNCTION__, "Only call this function while in-game");
+
+	std::unordered_map<std::string, ClientClass*> map;
+	ClientClass* client_class = gBase.Client->GetAllClasses();
+	while (client_class != nullptr) {
+		map.emplace(client_class->chName, client_class);
+		client_class = client_class->pNextClass;
+	}
+	return map;
+}
+
+bool FastEntityCheck(CBaseEntity* e, const std::string& class_name) {
+	static auto map = MakeClientClassMap();
+	auto it = map.find(class_name);
+	if (it == map.end())
+		return false;
+	return  e->Type() == it->second->iClassID;
 }
 
 void NetEntity::init()

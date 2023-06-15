@@ -16,15 +16,22 @@ public:
 
 	// Player effects
 
-	Listbox player_enabled = Listbox("Player materials", { "Disabled", "Default visibility", "Always visible", "Only through walls"}, 1);
-	Listbox hat_enabled = Listbox("Hat override", { "Disabled", "Same as player", "Hat color" },  1);
+	Listbox player_enabled = Listbox("Player materials", { "Disabled", "Default visibility", "Always visible", "Only through walls"}, 0);
+	Listbox hat_enabled = Listbox("Hat override", { "Disabled", "Same as player", "Hat color" }, 0);
 	ColorPicker player_mat = ColorPicker("Player color", SColor(200));
 	ColorPicker hat_mat = ColorPicker("Hat color", SColor(200));
 
 	// Heads-up display
 
 	Checkbox killfeed = Checkbox("Killfeed only");
+	Checkbox nozoom = Checkbox("No scope zoom");
 	Checkbox noscope = Checkbox("No scope overlay");
+	Checkbox scopefix = Checkbox("Draw scoped player");
+
+	// Filters
+
+	Checkbox fplayer = Checkbox("Players only");
+	Checkbox fview = Checkbox("Viewmodel only");
 
 	void FrameStageNotify(ClientFrameStage_t Stage);
 	void DrawModelExecute(

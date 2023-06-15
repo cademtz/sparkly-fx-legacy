@@ -7,7 +7,7 @@ class TextureHolder
 {
 public:
 	TextureHolder() {}
-	TextureHolder(const byte* pRawRGBAData, int W, int H)
+	TextureHolder(const uint8_t* pRawRGBAData, int W, int H)
 	{
 		m_iTexture = gBase.Surface->CreateNewTextureID(true);
 		if (!m_iTexture)
@@ -38,7 +38,7 @@ public:
 		return m_iH;
 	}
 
-	const byte* GetRGBA() const
+	const uint8_t* GetRGBA() const
 	{
 		return rawData;
 	}
@@ -56,7 +56,7 @@ public:
 protected:
 	int m_iTexture;
 	int m_iW, m_iH;
-	const byte* rawData;
+	const uint8_t* rawData;
 	bool m_bValid;
 };
 
@@ -107,7 +107,7 @@ public:
 
 	void DrawLine(int x, int y, int x1, int y1, SColor color);
 
-	byte GetESPHeight();
+	uint8_t GetESPHeight();
 	void DrawBox(Vector vOrigin, SColor color, int box_width, int radius);
 	void DrawRect(int x, int y, int w, int h, SColor color);
 	void OutlineRect(int x, int y, int w, int h, SColor color);

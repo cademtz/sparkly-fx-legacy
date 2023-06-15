@@ -418,7 +418,7 @@ void DrawColorBox(void* data, size_t Index)
 		color->color = hsv2rgb(
 			float(ccursorx) / colorpicker.GetWidth(),
 			1.f - (float(ccursory) / colorpicker.GetHeight()),
-			1.f - (float(vcursory) / brightness.GetHeight()));
+			1.f - (float(vcursory + 1) / brightness.GetHeight()));
 	else
 		color->color = color->cDef;
 

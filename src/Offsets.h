@@ -9,6 +9,7 @@ public:
 
 	DWORD LoadFromBuffer;
 	DWORD KeyValues;
+	DWORD ParentEnt;
 
 	void SafetyCheck(void* Pointer)
 	{

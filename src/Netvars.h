@@ -5,7 +5,10 @@
 #include <unordered_map>
 #include <memory>
 
+class CBaseEntity;
+
 void GetAllNetvars();
+bool FastEntityCheck(CBaseEntity* e, const std::string& class_name);
 
 class NetEntity
 {

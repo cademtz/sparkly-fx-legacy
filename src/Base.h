@@ -79,24 +79,24 @@ class IMemAlloc;
 class CBaseManager
 {
 public:
-	ICvar*				Cvar;
-	IPanel*				Panels;
-	CInput*				Input;
-	ISurface*			Surface;
-	CGlobals*			Globals;
-	CEntList*			EntList;
-	CHLClient*			Client;
-	CRenderView*		RenderView;
-	CPrediction*		Prediction;
-	IVModelInfo*		ModelInfo;
-	CModelRender*		ModelRender;
-	IEngineTrace*		EngineTrace;
-	EngineClient*		Engine;
-	CMaterialSystem*	MatSystem;
-	ClientModeShared*	ClientMode;
-	IGameEventManager2*	GameEventManager;
+	ICvar*				Cvar				= nullptr;
+	IPanel*				Panels				= nullptr;
+	CInput*				Input				= nullptr;
+	ISurface*			Surface				= nullptr;
+	CGlobals*			Globals				= nullptr;
+	CEntList*			EntList				= nullptr;
+	CHLClient*			Client				= nullptr;
+	CRenderView*		RenderView			= nullptr;
+	CPrediction*		Prediction			= nullptr;
+	IVModelInfo*		ModelInfo			= nullptr;
+	CModelRender*		ModelRender			= nullptr;
+	IEngineTrace*		EngineTrace			= nullptr;
+	EngineClient*		Engine				= nullptr;
+	CMaterialSystem*	MatSystem			= nullptr;
+	ClientModeShared*	ClientMode			= nullptr;
+	IGameEventManager2*	GameEventManager	= nullptr;
 
-	IMemAlloc* g_pMemAlloc;
+	IMemAlloc* g_pMemAlloc = nullptr;
 
 	bool GetInterfaces();
 	void HookInterfaces();

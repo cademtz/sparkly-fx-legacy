@@ -62,11 +62,11 @@ void CTextures::Initialize()
 }
 void CTextures::Reload()
 {
-	static const byte dark_gray_t[4] = { 50, 50, 50, 255 };
+	static const uint8_t dark_gray_t[4] = { 50, 50, 50, 255 };
 	gBase.Surface->DrawSetTextureRGBA(dark_gray, dark_gray_t, 1, 1);
-	static const byte team_blue_t[4] = { 0, 128, 255, 255 };
+	static const uint8_t team_blue_t[4] = { 0, 128, 255, 255 };
 	gBase.Surface->DrawSetTextureRGBA(team_blue, team_blue_t, 1, 1);
-	static const byte team_red_t[4] = { 186, 52, 53, 255 };
+	static const uint8_t team_red_t[4] = { 186, 52, 53, 255 };
 	gBase.Surface->DrawSetTextureRGBA(team_red, team_red_t, 1, 1);
 }
 //===================================================================================
@@ -84,14 +84,9 @@ void CDraw::DrawString(int x, int y, SColor color, const char *pszText, HFont fo
 		return;
 
 	va_list va_alist;
-	char szBuffer[1024] = { '\0' };
 	wchar_t szString[1024] = { '\0' };
-
-	va_start(va_alist, pszText);
-	vsprintf_s(szBuffer, pszText, va_alist);
-	va_end(va_alist);
-
-	wsprintfW(szString, L"%S", szBuffer);
+	
+	wsprintfW(szString, L"%S", pszText);
 
 	DrawString(x, y, color, szString, font);
 }
@@ -103,7 +98,7 @@ void CDraw::DrawString(int x, int y, SColor color, const wchar_t* wcText, HFont 
 	gBase.Surface->DrawPrintText(wcText, wcslen(wcText));
 }
 //===================================================================================
-byte CDraw::GetESPHeight()
+uint8_t CDraw::GetESPHeight()
 {
 	return ESP_HEIGHT;
 }

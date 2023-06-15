@@ -20,7 +20,7 @@ void __fastcall Hooked_PaintTraverse( PVOID pPanels, int edx, unsigned int vguiP
 
 	try
 	{
-		static VPANEL FocusOverlay = 0, BaseViewport = 0, HudScope = 0, HudDeath = 0;
+		static VPANEL FocusOverlay = 0, BaseViewport = 0, HudScope = 0, HudScopeCharge = 0, HudDeath = 0;
 		const char* szPanel = gBase.Panels->GetName(vguiPanel);
 		if (vguiPanel)
 		{
@@ -36,6 +36,7 @@ void __fastcall Hooked_PaintTraverse( PVOID pPanels, int edx, unsigned int vguiP
 				if (gBase.Panels->HasParent(FocusOverlay, parent) && (BaseViewport = FindPanel(parent, "CBaseViewport")))
 				{
 					HudScope = FindPanel(BaseViewport, "HudScope");
+					HudScopeCharge = FindPanel(BaseViewport, "HudScopeCharge");
 					HudDeath = FindPanel(BaseViewport, "HudDeathNotice");
 				}
 			}
@@ -48,7 +49,7 @@ void __fastcall Hooked_PaintTraverse( PVOID pPanels, int edx, unsigned int vguiP
 			{
 				if (vguiPanel == gBase.Panels->GetChild(BaseViewport, i))
 				{
-					if (gVisuals.noscope.value && vguiPanel == HudScope)
+					if (gVisuals.noscope.value && (vguiPanel == HudScope || vguiPanel == HudScopeCharge))
 						return;
 					if (gVisuals.killfeed.value && vguiPanel != HudDeath &&
 						(gVisuals.noscope.value || vguiPanel != HudScope))

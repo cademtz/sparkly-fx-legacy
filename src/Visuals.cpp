@@ -101,14 +101,24 @@ void CVisuals::DrawModelExecute(
 	matrix3x4 *pCustomBoneToWorld,
 	DrawModelExecuteFn Original )
 {
-	if (!player_enabled.value)
-		return;
-
 	CBaseEntity* entity;
 	if (!(entity = GetBaseEntity(pInfo.entity_index)))
 		return;
-	ent_id type = entity->Type();
-	if (type != ent_id::CTFPlayer && type != ent_id::CTFWearable)
+
+	if (fplayer.value || fview.value)
+	{
+		if (!(fplayer.value && entity->IsType(ent_id::CTFPlayer)) && !(fview.value && entity->IsType(ent_id::CTFViewModel)))
+		{
+			drawModel = false;
+			return;
+		}
+	}
+
+	if (!player_enabled.value)
+		return;
+
+	
+	if (!entity->IsType(ent_id::CTFPlayer) && !entity->IsType(ent_id::CTFWearable))
 		return;
 
 	// Normal visibility will just run once
@@ -120,9 +130,9 @@ void CVisuals::DrawModelExecute(
 	if (!desired)
 		return;
 
-	byte team = entity->Team();
+	uint8_t team = entity->Team();
 	SColor color = player_mat.bDef ? colors_team_light[team] : player_mat.color;
-	if (type == ent_id::CTFWearable)
+	if (entity->IsType(ent_id::CTFWearable))
 	{
 		if (!hat_enabled.value)
 			return;

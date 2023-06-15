@@ -27,6 +27,7 @@
 
 enum class e_offset :int
 {
+	ShouldDraw = 3,
 	m_nOutSequenceNr = 8,
 	DrawModelExecute = 19,
 	KeyEvent = 20,
