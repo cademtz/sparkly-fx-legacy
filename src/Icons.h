@@ -1,7 +1,7 @@
 #pragma once
-typedef unsigned char byte;
+#include <cstdint>
 
-static const byte arrow[8 * 8 * 4]
+static const uint8_t arrow[8 * 8 * 4]
 {
 	0, 0, 0, 0,
 	0, 0, 0, 0,
@@ -78,7 +78,7 @@ static const byte arrow[8 * 8 * 4]
 	0, 0, 0, 0,
 };
 
-static const byte arrowdown[8 * 8 * 4]
+static const uint8_t arrowdown[8 * 8 * 4]
 {
 	255, 255, 255, 255,
 	255, 255, 255, 255,
@@ -153,7 +153,7 @@ static const byte arrowdown[8 * 8 * 4]
 	0, 0, 0, 0,
 };
 
-static const byte arrowside[8 * 8 * 4]
+static const uint8_t arrowside[8 * 8 * 4]
 {
 	0, 0, 0, 0,
 	0, 0, 0, 0,
@@ -229,7 +229,7 @@ static const byte arrowside[8 * 8 * 4]
 };
 
 // Round color picker cursor
-static const byte picker[8 * 8 * 4]
+static const uint8_t picker[8 * 8 * 4]
 {
 	0, 0, 0, 0,
 	0, 0, 0, 0,

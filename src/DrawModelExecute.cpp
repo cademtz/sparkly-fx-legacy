@@ -8,6 +8,7 @@
 #include "Visuals.h"
 
 bool drawModel = true;
+bool drawStaticProps = true;
 
 void __stdcall Hooked_DrawModelExecute(
 	const DrawModelState_t &state,
@@ -38,4 +39,18 @@ bool __fastcall Hooked_ShouldDraw(IClientRenderable* Renderable) {
 
 	VMTManager& hook = VMTManager::GetHook(Renderable);
 	return hook.GetMethod<ShouldDrawFn>((int)e_offset::ShouldDraw)(Renderable);
+}
+
+int __stdcall Hooked_DrawStaticPropArrayFast( StaticPropRenderInfo_t *pProps, int count, bool bShadowDepth ) {
+	VMTManager& hook = VMTManager::GetHook(gBase.ModelRender);
+	auto CallOriginal = hook.GetMethod<DrawStaticPropArrayFastFn>((int)e_offset::DrawStaticPropArrayFast);
+
+	gVisuals.DrawStaticPropArrayFast(pProps, count, bShadowDepth);
+
+	int result = 1;
+	if (drawStaticProps)
+		result = CallOriginal(gBase.ModelRender, pProps, count, bShadowDepth);
+	drawStaticProps = true;
+
+	return result;
 }

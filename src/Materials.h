@@ -476,6 +476,12 @@ public:
 		return getvfunc<OriginalFn>(this, 1)(this, mat, type);
 	}
 
+	int	DrawModelExStaticProp(ModelRenderInfo_t &pInfo)
+	{
+		typedef int(__thiscall *OriginalFn)(PVOID, ModelRenderInfo_t&);
+		return getvfunc<OriginalFn>(this, 17)(this, pInfo);
+	}
+
 	void DrawModelExecute(const DrawModelState_t *state, const ModelRenderInfo_t &pInfo, matrix3x4 *pCustomBoneToWorld)
 	{
 		typedef void(__thiscall *OriginalFn)(PVOID, const DrawModelState_t*, const ModelRenderInfo_t &, matrix3x4 *);

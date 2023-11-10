@@ -96,9 +96,9 @@ void WindowStyle::About(int x, int y, int w, int h)
 	gBase.Surface->GetTextSize(gFonts.arial, L"Sparkly FX is a free software. If you paid for this, you were scammed.", iWidth, iHeight);
 	gDraw.DrawString(CenterX - (iWidth / 2), y + 5, SColor(160), L"Sparkly FX is a free software. If you paid for this, you were scammed.");
 
-	gBase.Surface->GetTextSize(gFonts.verdana, L"Have a question, want to chat, need to contact to me?", iWidth, iHeight);
-	gBase.Surface->GetTextSize(gFonts.calibri_light, L"Add me on Discord! \"Hold on!#0456\"", dcWidth, dcHeight);
+	gBase.Surface->GetTextSize(gFonts.verdana, L"Have a question?", iWidth, iHeight);
+	gBase.Surface->GetTextSize(gFonts.calibri_light, L"Add me on Discord! \"hold_on_\"", dcWidth, dcHeight);
 
-	gDraw.DrawString(CenterX - (iWidth / 2), y + 100, SColor(200), L"Have a question, want to chat, need to contact to me?", gFonts.verdana);
-	gDraw.DrawString(CenterX - (dcWidth / 2), y + 110 + iHeight, SColor(255), L"Add me on Discord! \"Hold on!#0456\"", gFonts.calibri_light);
+	gDraw.DrawString(CenterX - (iWidth / 2), y + 100, SColor(200), L"Have a question?", gFonts.verdana);
+	gDraw.DrawString(CenterX - (dcWidth / 2), y + 110 + iHeight, SColor(255), L"Add me on Discord! \"hold_on_\"", gFonts.calibri_light);
 }

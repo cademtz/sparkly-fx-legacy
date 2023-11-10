@@ -67,12 +67,12 @@ void CBaseManager::HookInterfaces()
 
 	VMTBaseManager* modelHook = new VMTBaseManager(gBase.ModelRender);
 	modelHook->HookMethod(&Hooked_DrawModelExecute, e_offset::DrawModelExecute);
+	modelHook->HookMethod(&Hooked_DrawStaticPropArrayFast, e_offset::DrawStaticPropArrayFast);
 	modelHook->Rehook();
 
-	HWND thisWindow;
-	while (!(thisWindow = FindWindow("Valve001", NULL)))
+	while (!(hwnd = FindWindowA("Valve001", NULL)))
 		Sleep(500);
-	gMenu.windowProc = (WNDPROC)SetWindowLongPtr(thisWindow, GWLP_WNDPROC, (LONG_PTR)&Hooked_WndProc);
+	gMenu.windowProc = (WNDPROC)SetWindowLongPtr(hwnd, GWLP_WNDPROC, (LONG_PTR)&Hooked_WndProc);
 
 	Engine->ClientCmd_Unrestricted("echo Sparkly FX: Hooked stuff...");
 }
@@ -94,7 +94,7 @@ void COffsets::GetOffsets()
 
 CreateInterface::CreateInterface(const char* szModule, bool handleError)
 {
-	instance = (CreateInterfaceFn)GetProcAddress(GetModuleHandle(szModule), "CreateInterface");
+	instance = (CreateInterfaceFn)GetProcAddress(GetModuleHandleA(szModule), "CreateInterface");
 	if (!instance && handleError)
 		gBase.Fatal("Fatal error", "Failed to get a CreateInterface handle to '%s'!%s", szModule, "\nThe program will now exit.");
 }
@@ -116,6 +116,6 @@ void CBaseManager::Fatal(const char* szTitle, const char* szMessage, ...)
 	vsprintf_s(szBuffer, szMessage, va_alist);
 	va_end(va_alist);
 
-	MessageBox(NULL, szBuffer, szTitle, MB_OK);
+	MessageBoxA(NULL, szBuffer, szTitle, MB_OK);
 	exit(EXIT_FAILURE);
 }

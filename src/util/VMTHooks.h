@@ -29,7 +29,9 @@ enum class e_offset :int
 {
 	ShouldDraw = 3,
 	m_nOutSequenceNr = 8,
+	DrawModelExStaticProp = 17,
 	DrawModelExecute = 19,
+	DrawStaticPropArrayFast = 21,
 	KeyEvent = 20,
 	CreateMove = 21,
 	WriteUserCmdToBuffer = 23,

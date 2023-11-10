@@ -4,6 +4,7 @@
 
 #define WIN32_LEAN_AND_MEAN
 #include <string>
+#include <Windows.h>
 #include "Vector.h"
 #include "Vector2.h"
 #include "Offsets.h"
@@ -12,7 +13,6 @@
 #define RADPI 57.295779513082f
 
 using namespace std;
-typedef unsigned char byte;
 
 typedef void* (*CreateInterfaceFn)(const char *pName, int *pReturnCode);
 typedef struct CreateInterface
@@ -97,6 +97,8 @@ public:
 	IGameEventManager2*	GameEventManager	= nullptr;
 
 	IMemAlloc* g_pMemAlloc = nullptr;
+
+	HWND hwnd;
 
 	bool GetInterfaces();
 	void HookInterfaces();

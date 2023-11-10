@@ -19,6 +19,7 @@ target_sources(sparkly-fx PRIVATE
     Panels.cpp
     Styles.cpp
     Visuals.cpp
+    Clipboard.cpp
 )
 
 add_subdirectory(util)

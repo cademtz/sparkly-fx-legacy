@@ -11,6 +11,7 @@ public:
 	// World settings
 
 	Checkbox world_enabled = Checkbox("Enabled");
+	Checkbox props_enabled = Checkbox("Draw props", true);
 	ColorPicker world_clr = ColorPicker("World color", SColor(200));
 	ColorPicker sky_clr = ColorPicker("Sky color", SColor(200));
 
@@ -39,6 +40,7 @@ public:
 		const ModelRenderInfo_t &pInfo,
 		matrix3x4 *pCustomBoneToWorld,
 		DrawModelExecuteFn Original );
+	int DrawStaticPropArrayFast( StaticPropRenderInfo_t *pProps, int count, bool bShadowDepth );
 };
 
 extern CVisuals gVisuals;

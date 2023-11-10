@@ -154,3 +154,9 @@ void CVisuals::DrawModelExecute(
 	if (bReset)
 		gMat.ResetMaterial();
 }
+
+int CVisuals::DrawStaticPropArrayFast( StaticPropRenderInfo_t *pProps, int count, bool bShadowDepth ) {
+	if (!props_enabled.value)
+		drawStaticProps = false;
+	return 0;
+}

@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 
 typedef unsigned long HFont;
 typedef unsigned long Texture;
@@ -73,13 +74,12 @@ struct Vertex_t
 	Vector2	m_TexCoord;
 };
 
-typedef unsigned char byte;
 class SColor
 {
 public:
-	byte rgba[4];
+	uint8_t rgba[4];
 
-	inline byte& operator[](int i)
+	inline uint8_t& operator[](int i)
 	{
 		return rgba[i];
 	}
@@ -92,11 +92,11 @@ public:
 		return *(size_t*)&rgba != *(size_t*)&other.rgba;
 	}
 
-	SColor(byte red, byte green, byte blue, byte alpha = 255)
+	SColor(uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha = 255)
 	{
 		rgba[0] = red, rgba[1] = green, rgba[2] = blue, rgba[3] = alpha;
 	}
-	SColor(byte bright, byte alpha = 255)
+	SColor(uint8_t bright, uint8_t alpha = 255)
 	{
 		rgba[0] = bright, rgba[1] = bright, rgba[2] = bright, rgba[3] = alpha;
 	}

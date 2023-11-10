@@ -18,8 +18,13 @@ void Menu::CreateGUI()
 		new Tab("Visuals", {
 			new Groupbox("World settings", {
 				&gVisuals.world_enabled,
+				&gVisuals.props_enabled,
 				&gVisuals.world_clr,
 				&gVisuals.sky_clr
+			}, GROUP_WIDTH),
+			new Groupbox("Filters", {
+				&gVisuals.fplayer,
+				&gVisuals.fview,
 			}, GROUP_WIDTH),
 			new Groupbox("Player effects", {
 				&gVisuals.player_enabled,
@@ -32,10 +37,6 @@ void Menu::CreateGUI()
 				&gVisuals.nozoom,
 				&gVisuals.noscope,
 				&gVisuals.scopefix
-			}, GROUP_WIDTH),
-			new Groupbox("Filters", {
-				&gVisuals.fplayer,
-				&gVisuals.fview,
 			}, GROUP_WIDTH),
 		})
 	);

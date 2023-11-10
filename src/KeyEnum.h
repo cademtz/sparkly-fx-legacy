@@ -1,6 +1,7 @@
 #pragma once
 #include <Windows.h>
 #include <string>
+#include <cstdint>
 using namespace std;
 
 class CKey
@@ -11,7 +12,7 @@ public:
 		return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9');
 	}
 
-	inline bool AcceptedKey(byte c)
+	inline bool AcceptedKey(uint8_t c)
 	{
 		return
 			AlphaChar(c) ||
@@ -19,7 +20,7 @@ public:
 			c == VK_LBUTTON || c == VK_RBUTTON || c == VK_MBUTTON;
 	}
 
-	string KeyToString(byte c)
+	string KeyToString(uint8_t c)
 	{
 		if (!AcceptedKey(c))
 			return to_string(c);

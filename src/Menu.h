@@ -1,4 +1,7 @@
 #pragma once
+#include "Controls.h"
+#include "Styles.h"
+#include <cstdint>
 
 enum class e_mb
 {
@@ -22,8 +25,6 @@ enum class e_focus
 	dialog
 };
 
-#include "Controls.h"
-#include "Styles.h"
 class Menu
 {
 public:
@@ -52,14 +53,14 @@ public:
 
 	// - Store flags for all keys.
 	// - The largest integers can't hold 256 flags, so we use an array
-	byte keys[256];
+	uint8_t keys[256];
 
 	// - Virtual key of the newest index
 	// - Also the index to find that key in keys[]
-	byte last_key = NULL;
+	uint8_t last_key = NULL;
 
 	// - Indicates a keypress for one frame
-	byte key = NULL;
+	uint8_t key = NULL;
 
 	inline const TabGroup* GetTabs()
 	{

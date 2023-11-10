@@ -2,6 +2,7 @@
 #include "Draw utils.h"
 #include <Windows.h>
 #include <vector>
+#include <cstdint>
 using namespace std;
 
 #define CONTROL_WIDTH 100
@@ -279,7 +280,7 @@ public:
 };
 
 #include "KeyEnum.h"
-enum class e_kbmode : byte
+enum class e_kbmode : uint8_t
 {
 	disabled,
 	always,
@@ -293,14 +294,14 @@ class KeyBind : public BaseControl
 public:
 	e_kbmode mode = e_kbmode::always;
 
-	byte key = NULL;
+	uint8_t key = NULL;
 	bool UpdateKeys();
 	bool KeyDown();
 
 	int Draw(bool mouseOver = false);
 	void HandleInput();
 
-	KeyBind(const char* Name, byte VirtualKey, e_kbmode Mode = e_kbmode::disabled, int W = 100, int X = 0, int Y = 0)
+	KeyBind(const char* Name, uint8_t VirtualKey, e_kbmode Mode = e_kbmode::disabled, int W = 100, int X = 0, int Y = 0)
 	{
 		type = e_control::keybind, flags = scale_width;
 		name = Name, key = VirtualKey, mode = Mode, x = X, y = Y;

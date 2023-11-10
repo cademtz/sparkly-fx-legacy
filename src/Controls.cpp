@@ -3,9 +3,12 @@
 #include "Menu.h"
 #include "Styles.h"
 #include "Icons.h"
+#include "Clipboard.h"
+#include <string_view>
+#include <optional>
 
-static TextureHolder arrow_t, arrowside_t, arrowdown_t;
-static TextureHolder colorpicker, brightness, picker_t;
+static TextureHolder arrow_tex, arrowside_tex, arrowdown_tex;
+static TextureHolder colorpicker_tex, brightness_tex, picker_tex;
 
 #define LTEXT SColor(220)
 #define BTEXT SColor(150)
@@ -15,12 +18,12 @@ static TextureHolder colorpicker, brightness, picker_t;
 
 void InitTextures()
 {
-	arrow_t = TextureHolder(arrow, 8, 8);
-	arrowside_t = TextureHolder(arrowside, 8, 8);
-	arrowdown_t = TextureHolder(arrowdown, 8, 8);
+	arrow_tex = TextureHolder(arrow, 8, 8);
+	arrowside_tex = TextureHolder(arrowside, 8, 8);
+	arrowdown_tex = TextureHolder(arrowdown, 8, 8);
 
 	// Hue and saturation gradient
-	byte* coloures = new byte[128 * 128 * 4];
+	uint8_t* coloures = new uint8_t[128 * 128 * 4];
 	int i = 0;
 	for (int h = 0; h < 128; h++)
 	{
@@ -34,7 +37,7 @@ void InitTextures()
 	i = 0;
 
 	// Value gradient
-	byte* value = new byte[32 * 128 * 4];
+	uint8_t* value = new uint8_t[32 * 128 * 4];
 	for (int h = 0; h < 128; h++)
 	{
 		for (int w = 0; w < 32; w++)
@@ -45,9 +48,9 @@ void InitTextures()
 		}
 	}
 
-	colorpicker = TextureHolder(coloures, 128, 128);
-	brightness = TextureHolder(value, 32, 128);
-	picker_t = TextureHolder(picker, 8, 8);
+	colorpicker_tex = TextureHolder(coloures, 128, 128);
+	brightness_tex = TextureHolder(value, 32, 128);
+	picker_tex = TextureHolder(picker, 8, 8);
 }
 
 // ===== BaseControl =====
@@ -250,7 +253,7 @@ int Slider::Draw(bool mouseOver)
 	if (mouseOver)
 	{
 		gDraw.DrawRect(x, y + 17, percent, 4, HTEXT);
-		arrow_t.Draw(x + percent - 3, y + 17, CTEXT);
+		arrow_tex.Draw(x + percent - 3, y + 17, CTEXT);
 	}
 	else
 		gDraw.DrawRect(x, y + 17, percent, 4, SColor(85, 85, 95));
@@ -282,7 +285,7 @@ int Listbox::Draw(bool mouseOver)
 
 	gMenu.style->DialogButton(x, y + TEXTH, w, list[value].c_str(), mouseOver);
 
-	arrowdown_t.Draw(x + w - 10, y + TEXTH + 6, SColor(125, 125, 140));
+	arrowdown_tex.Draw(x + w - 10, y + TEXTH + 6, SColor(125, 125, 140));
 	return h;
 }
 
@@ -348,6 +351,40 @@ int ColorPicker::Draw(bool mouseOver)
 
 void DrawColorBox(void* data, size_t Index);
 static Dialog colorDlg(DrawColorBox);
+// Parse color in the form of `#RRGGBB` or `RRGGBB`
+static std::optional<SColor> ParseHexRGB(std::string_view text)
+{
+	if (text.length() == 0)
+		return std::nullopt;
+	
+	size_t str_index = 0;
+	if (text[0] == '#')
+		++str_index;
+	
+	SColor result(0);
+	for (size_t c = 0; c < 3; ++c) // For each color channel
+	{
+		for (size_t _i = 0; _i < 2; ++_i, ++str_index) // Parse 2 nibbles
+		{
+			if (str_index >= text.length())
+				return std::nullopt;
+			
+			uint8_t nibble;
+			char ch = text[str_index];
+			if (ch >= 'a' && ch <= 'f')
+				nibble = ch - 'a' + 0xA;
+			else if (ch >= 'A' && ch <= 'F')
+				nibble = ch - 'A' + 0xA;
+			else if (ch >= '0' && ch <= '9')
+				nibble = ch - '0';
+			else
+				return std::nullopt;
+			
+			result[c] = (result[c] << 4) | nibble;
+		}
+	}
+	return result;
+}
 
 void ColorPicker::HandleInput()
 {
@@ -361,43 +398,49 @@ void ColorPicker::HandleInput()
 
 void DrawColorBox(void* data, size_t Index)
 {
-	BaseControl* control = (BaseControl*)data;
-	if (control == nullptr || control->type != e_control::colorpicker)
+	const int dlg_width = 173;
+	const int dlg_height = 220;
+
+	ColorPicker* colorpicker = (ColorPicker*)data;
+	if (colorpicker == nullptr || colorpicker->type != e_control::colorpicker)
 		return gMenu.CloseDialog(Index);
 
-	if (gMenu.mb == e_mb::lclick && !gMenu.mouseOver(colorDlg.x, colorDlg.y, 175, 185))
+	if (gMenu.mb == e_mb::lclick && !gMenu.mouseOver(colorDlg.x, colorDlg.y, dlg_width, dlg_height))
 		return gMenu.CloseDialog(Index);
 
-	gMenu.style->Dialog(colorDlg.x, colorDlg.y, 175, 185);
-	int X = colorDlg.x + 2, Y = colorDlg.y + 2, W = 171, H = 181;
+	gMenu.style->Dialog(colorDlg.x, colorDlg.y, dlg_width, dlg_height);
+	int X = colorDlg.x + 2, Y = colorDlg.y + 2, W = dlg_width - 4, H = dlg_height - 4;
 
+	char text_buffer[64];
 	static int ccursorx = 50, ccursory = 50;
 	static int vcursory = 0;
-
+	int next_control_y = Y + 30 + colorpicker_tex.GetHeight() + 5;
 	static bool mColorbox = false, mValue = false;
-	if (gMenu.mb == e_mb::lclick && gMenu.mouseOver(X + 5, Y + 30, colorpicker.GetWidth(), colorpicker.GetHeight()))
+
+	if (gMenu.mb == e_mb::lclick && gMenu.mouseOver(X + 5, Y + 30, colorpicker_tex.GetWidth(), colorpicker_tex.GetHeight()))
 		mColorbox = true;
 	else if (gMenu.mb != e_mb::ldown)
 		mColorbox = false;
 
-	if (gMenu.mb == e_mb::lclick && gMenu.mouseOver(X + colorpicker.GetWidth() + 10, Y + 30, 15, brightness.GetHeight()))
+	if (gMenu.mb == e_mb::lclick && gMenu.mouseOver(X + colorpicker_tex.GetWidth() + 10, Y + 30, 15, brightness_tex.GetHeight()))
 		mValue = true;
 	else if (gMenu.mb != e_mb::ldown)
 		mValue = false;
 
+	bool is_dragging_color = mColorbox || mValue;
 	if (mColorbox)
 	{
 		ccursorx = gMenu.mouse.x - X - 5, ccursory = gMenu.mouse.y - Y - 30;
 
 		if (ccursorx < 0)
 			ccursorx = 0;
-		else if (ccursorx > colorpicker.GetWidth())
-			ccursorx = colorpicker.GetWidth();
+		else if (ccursorx > colorpicker_tex.GetWidth() - 1)
+			ccursorx = colorpicker_tex.GetWidth() - 1;
 
 		if (ccursory < 0)
 			ccursory = 0;
-		else if (ccursory > colorpicker.GetHeight() - 1)
-			ccursory = colorpicker.GetHeight() - 1;
+		else if (ccursory > colorpicker_tex.GetHeight())
+			ccursory = colorpicker_tex.GetHeight();
 	}
 	else if (mValue)
 	{
@@ -405,34 +448,66 @@ void DrawColorBox(void* data, size_t Index)
 
 		if (vcursory < 0)
 			vcursory = 0;
-		else if (vcursory > brightness.GetHeight() - 1)
-			vcursory = brightness.GetHeight() - 1;
+		else if (vcursory > brightness_tex.GetHeight())
+			vcursory = brightness_tex.GetHeight();
 	}
 
-	ColorPicker* color = (ColorPicker*)control;
 
 	static Checkbox checkbox("Default");
-	color->bDef = checkbox.QuickReturn(color->bDef, X + 5, Y + 30 + colorpicker.GetHeight() + 5);
+	bool was_default = colorpicker->bDef;
+	colorpicker->bDef = checkbox.QuickReturn(colorpicker->bDef, X + 5, next_control_y);
+	next_control_y += checkbox.GetHeight() + 5;
 
-	if (!color->bDef)
-		color->color = hsv2rgb(
-			float(ccursorx) / colorpicker.GetWidth(),
-			1.f - (float(ccursory) / colorpicker.GetHeight()),
-			1.f - (float(vcursory + 1) / brightness.GetHeight()));
-	else
-		color->color = color->cDef;
+	// If 'Default' was unchecked, then make the picker grab the color under the cursor
+	if (was_default && !colorpicker->bDef)
+		is_dragging_color = true;
 
-	gDraw.OutlineRect(X + 4, Y + 29, colorpicker.GetWidth() + 2, colorpicker.GetHeight() + 2, SColor(58, 58, 70));
-	colorpicker.Draw(X + 5, Y + 30, SColor(255 - (float(vcursory) / brightness.GetHeight()) * 255));
+	if (colorpicker->bDef)
+		colorpicker->color = colorpicker->cDef;
+	else if (is_dragging_color)
+	{
+		colorpicker->color = hsv2rgb(
+			float(ccursorx) / colorpicker_tex.GetWidth(),
+			1.f - (float(ccursory) / colorpicker_tex.GetHeight()),
+			1.f - (float(vcursory) / brightness_tex.GetHeight()));
+	}
+	else // Copy/paste color
+	{
+		if (gMenu.keys[VK_CONTROL] && gMenu.keys['C'])
+		{
+			sprintf_s(text_buffer, "#%.2X%.2X%.2X", colorpicker->color[0], colorpicker->color[1], colorpicker->color[2]);
+			CClipboard::Paste(text_buffer);
+		}
+		else if (gMenu.keys[VK_CONTROL] && gMenu.keys['V'])
+		{
+			std::optional<std::string> result = CClipboard::CopyAscii();
+			if (result)
+			{
+				std::optional<SColor> new_color = ParseHexRGB(result.value());
+				if (new_color)
+					colorpicker->color = new_color.value();
+			}
+		}
+	}
+	
+	sprintf_s(text_buffer, "#%.2X%.2X%.2X", colorpicker->color[0], colorpicker->color[1], colorpicker->color[2]);
+	gDraw.DrawString(X + 5, next_control_y, SColor(230), text_buffer, gFonts.verdana_bold);
+	next_control_y += 18;
 
-	gDraw.OutlineRect(X + colorpicker.GetWidth() + 9, Y + 29, 16 + 2, brightness.GetHeight() + 2, SColor(58, 58, 70));
-	brightness.Draw(X + colorpicker.GetWidth() + 10, Y + 30);
+	sprintf_s(text_buffer, "(Use Ctrl+C & Ctrl+V)", ccursorx, ccursory, vcursory);
+	gDraw.DrawString(X + 5, next_control_y, SColor(150), text_buffer, gFonts.verdana_bold);
 
-	gDraw.OutlineRect(X + 4, Y + 4, colorpicker.GetWidth() + 23, 22, SColor(58, 58, 70));
-	gDraw.DrawRect(X + 5, Y + 5, colorpicker.GetWidth() + 21, 20, color->color);
+	gDraw.OutlineRect(X + 4, Y + 29, colorpicker_tex.GetWidth() + 2, colorpicker_tex.GetHeight() + 2, SColor(58, 58, 70));
+	colorpicker_tex.Draw(X + 5, Y + 30, SColor(255 - (float(vcursory) / brightness_tex.GetHeight()) * 255));
 
-	picker_t.Draw(X + 5 + ccursorx - 4, Y + 30 + ccursory - 4);
-	arrowside_t.Draw(X + colorpicker.GetWidth() + 30, Y + 30 + vcursory);
+	gDraw.OutlineRect(X + colorpicker_tex.GetWidth() + 9, Y + 29, 16 + 2, brightness_tex.GetHeight() + 2, SColor(58, 58, 70));
+	brightness_tex.Draw(X + colorpicker_tex.GetWidth() + 10, Y + 30);
+
+	gDraw.OutlineRect(X + 4, Y + 4, colorpicker_tex.GetWidth() + 23, 22, SColor(58, 58, 70));
+	gDraw.DrawRect(X + 5, Y + 5, colorpicker_tex.GetWidth() + 21, 20, colorpicker->color);
+
+	picker_tex.Draw(X + 5 + ccursorx - 4, Y + 30 + ccursory - 4);
+	arrowside_tex.Draw(X + colorpicker_tex.GetWidth() + 30, Y + 30 + vcursory - 2);
 }
 
 // ===== KeyBind =====
