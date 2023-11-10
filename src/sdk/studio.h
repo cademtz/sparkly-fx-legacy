@@ -54,7 +54,7 @@ struct mstudiohitboxset_t
 	inline char * const	pszName(void) const { return ((char *)this) + sznameindex; }
 	int					numhitboxes;
 	int					hitboxindex;
-	inline mstudiobbox_t *pHitbox(int i) const { return (mstudiobbox_t *)(((byte *)this) + hitboxindex) + i; };
+	inline mstudiobbox_t *pHitbox(int i) const { return (mstudiobbox_t *)(((uint8_t *)this) + hitboxindex) + i; };
 };
 
 struct mstudiobone_t
@@ -78,7 +78,7 @@ struct mstudiobone_t
 	int					proctype;
 	int					procindex;		// procedural rule
 	mutable int			physicsbone;	// index into physically simulated bone
-	inline void *pProcedure() const { if (procindex == 0) return NULL; else return  (void *)(((byte *)this) + procindex); };
+	inline void *pProcedure() const { if (procindex == 0) return NULL; else return  (void *)(((uint8_t *)this) + procindex); };
 	int					surfacepropidx;	// index into string tablefor property name
 	inline char * const pszSurfaceProp(void) const { return ((char *)this) + surfacepropidx; }
 	int					contents;		// See BSPFlags.h for the contents flags
@@ -117,7 +117,7 @@ struct studiohdr_t
 	int numbones;
 	int boneindex;
 
-	inline mstudiobone_t *GetBone(int i) const { return (mstudiobone_t *)(((byte *)this) + boneindex) + i; };
+	inline mstudiobone_t *GetBone(int i) const { return (mstudiobone_t *)(((uint8_t *)this) + boneindex) + i; };
 	//	inline mstudiobone_t *pBone(int i) const { Assert(i >= 0 && i < numbones); return (mstudiobone_t *)(((byte *)this) + boneindex) + i; };
 
 	int numbonecontrollers;
@@ -128,7 +128,7 @@ struct studiohdr_t
 
 	mstudiohitboxset_t* GetHitboxSet(int i) const
 	{
-		return (mstudiohitboxset_t*)(((byte*)this) + hitboxsetindex) + i;
+		return (mstudiohitboxset_t*)(((uint8_t*)this) + hitboxsetindex) + i;
 	}
 
 	inline mstudiobbox_t* GetHitbox(int i, int set) const
@@ -226,13 +226,13 @@ struct studiohdr_t
 	void *pVertexBase;
 	void *pIndexBase;
 
-	byte constdirectionallightdot;
+	uint8_t constdirectionallightdot;
 
-	byte rootLOD;
+	uint8_t rootLOD;
 
-	byte numAllowedRootLODs;
+	uint8_t numAllowedRootLODs;
 
-	byte unused[1];
+	uint8_t unused[1];
 
 	int unused4;
 

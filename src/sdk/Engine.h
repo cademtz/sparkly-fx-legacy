@@ -2,6 +2,7 @@
 #include "Base.h"
 #include "getvfunc.h"
 #include "CSignature.h"
+#include <cstdint>
 
 using namespace std;
 
@@ -101,7 +102,7 @@ public:
 	float sidemove; //1C
 	float upmove; //20
 	int	buttons; //24
-	byte impulse; //28
+	uint8_t impulse; //28
 	int weaponselect; //2C
 	int weaponsubtype; //30
 	int random_seed; //34
